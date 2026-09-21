@@ -1,9 +1,12 @@
 package br.com.aula.api_produtos.config;
 
 import br.com.aula.api_produtos.entity.Produto;
+import br.com.aula.api_produtos.entity.Usuario;
 import br.com.aula.api_produtos.repository.ProdutoRepository;
+import br.com.aula.api_produtos.repository.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -13,9 +16,13 @@ import java.util.*;
 @Configuration
 public class CargaDadosInicial implements CommandLineRunner {
     private final ProdutoRepository repository;
+    private final UsuarioRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public CargaDadosInicial(ProdutoRepository repository) {
+    public CargaDadosInicial(ProdutoRepository repository, UsuarioRepository userRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -50,6 +57,23 @@ public class CargaDadosInicial implements CommandLineRunner {
                             .build()
             );
             repository.saveAll(produtosIniciais);
+        }
+
+        if (userRepository.count() == 0) {
+            List<Usuario> usuariosIniciais = List.of(
+                    Usuario.builder()
+                            .username("Eduardo supremo Geffert")
+                            .password(passwordEncoder.encode("12345678"))
+                            .role("ADMIN")
+                            .build(),
+
+                    Usuario.builder()
+                            .username("cherpinski")
+                            .password(passwordEncoder.encode("23456789"))
+                            .role("CLIENTE")
+                            .build()
+            );
+            userRepository.saveAll(usuariosIniciais);
         }
     }
 }

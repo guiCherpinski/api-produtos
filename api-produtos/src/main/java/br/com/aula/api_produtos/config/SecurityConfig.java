@@ -21,10 +21,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
         return http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.POST).hasRole("admin")
-                        .requestMatchers(HttpMethod.PUT).hasRole("admin")
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/produtos", "/api/v1/produtos/**").permitAll()
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/v1/produtos").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/produtos/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/produtos/**").hasAuthority("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -36,20 +43,20 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder){
-        var userComum = User.builder()
-                .username("cliente")
-                .password(passwordEncoder.encode("123456"))
-                .roles("user")
-                .build();
-
-        var userAdmin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("234567"))
-                .roles("admin")
-                .build();
-
-        return new InMemoryUserDetailsManager(userComum,userAdmin);
-    }
+    //@Bean
+    //public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder){
+    //    var userComum = User.builder()
+    //            .username("cliente")
+    //            .password(passwordEncoder.encode("123456"))
+    //            .roles("user")
+    //            .build();
+//
+    //    var userAdmin = User.builder()
+    //            .username("admin")
+    //            .password(passwordEncoder.encode("234567"))
+    //            .roles("admin")
+    //            .build();
+//
+    //    return new InMemoryUserDetailsManager(userComum,userAdmin);
+    //}
 }
