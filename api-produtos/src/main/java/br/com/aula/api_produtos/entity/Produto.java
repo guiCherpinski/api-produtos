@@ -1,5 +1,6 @@
 package br.com.aula.api_produtos.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,16 +20,20 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class Produto {
+    @Schema(description = "Identificador único de produto")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Schema(description = "Nome do produto")
     @Column(nullable = false , length = 100)
     private String nome;
 
+    @Schema(description = "Preço do produto")
     @Column(nullable = false)
     private BigDecimal preco;
 
+    @Schema(description = "Status do produto")
     @Column(nullable = false)
     private Boolean ativo;
 }
